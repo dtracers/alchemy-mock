@@ -54,7 +54,14 @@ class UnorderedCall(Call):
     def __eq__(self, other):
         _other = list(other)
         _other[-2] = UnorderedTuple(other[-2])
-        other = Call(tuple(_other), **vars(other))
+        try:
+            other = Call(tuple(_other), **vars(other))
+        except TypeError:
+            variable = vars(other)
+            variable['name'] = variable.pop('_mock_name')
+            variable['parent'] = variable.pop('_mock_parent')
+            variable['from_kall'] = variable.pop('_mock_from_kall')
+            other = Call(tuple(_other), variable)
 
         return super(UnorderedCall, self).__eq__(other)
 
